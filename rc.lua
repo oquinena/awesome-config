@@ -232,7 +232,8 @@ globalkeys = my_table.join(
     { description = "lock screen", group = "hotkeys" }),
 
   -- xrandr extension
-  awful.key({ modkey, "Control" }, "m", function() xrandr.xrandr() end),
+  awful.key({ modkey, "Control" }, "m", function() xrandr.xrandr() end,
+    { description = "Toggle xrandr", group = "hotkeys" }),
 
   -- scratchpad
   awful.key({ modkey, }, "u", function() term_scratch:toggle() end,
