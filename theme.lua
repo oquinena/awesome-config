@@ -242,11 +242,11 @@ function theme.at_screen_connect(s)
       brighticon,
       brightwidget,
       clockicon,
-      wibox.container.background(clock, theme.bg_normal),
+      clock,
       spr,
       wibox.widget.systray(),
       spr,
-      wibox.container.background(s.mylayoutbox, theme.bg_normal),
+      s.mylayoutbox,
     },
   }
 end
