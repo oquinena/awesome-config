@@ -4,9 +4,9 @@ pcall(require, "luarocks.loader")
 local awesome, client, mouse, screen, tag = awesome, client, mouse, screen, tag
 local ipairs, string, os, table, tostring, tonumber, type = ipairs, string, os, table, tostring, tonumber, type
 
-local gears = require("gears")
-local awful = require("awful")
-require("awful.autofocus")
+local gears         = require("gears")
+local awful         = require("awful")
+                      require("awful.autofocus")
 local wibox         = require("wibox")
 local beautiful     = require("beautiful")
 local naughty       = require("naughty")
@@ -14,11 +14,11 @@ local lain          = require("lain")
 local xrandr        = require("xrandr")
 local freedesktop   = require("freedesktop")
 local hotkeys_popup = require("awful.hotkeys_popup").widget
-require("awful.hotkeys_popup.keys")
-local my_table   = awful.util.table or gears.table -- 4.{0,1} compatibility
-local dpi        = require("beautiful.xresources").apply_dpi
-local revelation = require("revelation")
-local bling      = require("bling")
+                      require("awful.hotkeys_popup.keys")
+local my_table      = awful.util.table or gears.table -- 4.{0,1} compatibility
+local dpi           = require("beautiful.xresources").apply_dpi
+local revelation    = require("revelation")
+local bling         = require("bling")
 -- }}}
 
 -- {{{ Error handling
