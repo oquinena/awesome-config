@@ -358,14 +358,6 @@ globalkeys = my_table.join(
     end,
     { description = "restore minimized", group = "client" }),
 
-  -- Widgets popups
-  -- awful.key({ altkey, }, "c", function() if beautiful.cal then beautiful.cal.show(7) end end,
-  --   { description = "show calendar", group = "widgets" }),
-  -- awful.key({ altkey, }, "h", function() if beautiful.fs then beautiful.fs.show(7) end end,
-  --   { description = "show filesystem", group = "widgets" }),
-  -- awful.key({ altkey, }, "w", function() if beautiful.weather then beautiful.weather.show(7) end end,
-  --   { description = "show weather", group = "widgets" }),
-
   -- Brightness
   awful.key({}, "XF86MonBrightnessUp", function() os.execute("sudo light -A 10") end,
     { description = "+10%", group = "hotkeys" }),
@@ -393,7 +385,7 @@ globalkeys = my_table.join(
   -- User programs
   awful.key({ modkey }, "q", function() awful.spawn(browser) end,
     { description = "run browser", group = "launcher" }),
-  awful.key({ modkey }, "a", function() awful.spawn(guieditor) end,
+  awful.key({ modkey }, "y", function() awful.spawn(guieditor) end,
     { description = "run gui editor", group = "launcher" }),
   awful.key({}, "XF86Calculator", function() awful.spawn("galculator") end,
     { description = "run calculator", group = "launcher" }),
