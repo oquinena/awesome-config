@@ -123,21 +123,21 @@ local bat = lain.widget.bat({
   end
 })
 
--- ALSA volume
+-- PulseAudio volume
 local volicon = wibox.widget.imagebox(theme.widget_vol)
-theme.volume = lain.widget.alsa({
+local volume = lain.widget.pulse({
   settings = function()
-    if volume_now.status == "off" then
+    if volume_now.muted == "yes" then
       volicon:set_image(theme.widget_vol_mute)
-    elseif tonumber(volume_now.level) == 0 then
+    elseif tonumber(volume_now.left) == 0 then
       volicon:set_image(theme.widget_vol_no)
-    elseif tonumber(volume_now.level) <= 50 then
+    elseif tonumber(volume_now.left) <= 50 then
       volicon:set_image(theme.widget_vol_low)
     else
       volicon:set_image(theme.widget_vol)
     end
 
-    widget:set_markup(markup.font(theme.font, " " .. volume_now.level .. "% "))
+    widget:set_markup(markup.font(theme.font, " " .. volume_now.left .. "% "))
   end
 })
 
@@ -236,7 +236,7 @@ function theme.at_screen_connect(s)
     { -- Right widgets
       layout = wibox.layout.fixed.horizontal,
       volicon,
-      theme.volume.widget,
+      volume,
       baticon,
       bat.widget,
       brighticon,
