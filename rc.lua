@@ -45,6 +45,10 @@ do
 end
 -- }}}
 
+-- {{{ Notifications
+naughty.config.defaults.ontop = true
+-- }}}
+
 local modkey     = "Mod4"
 local altkey     = "Mod1"
 local terminal   = "alacritty"
@@ -174,8 +178,8 @@ awful.util.mymainmenu = freedesktop.menu.build({
 local term_scratch = bling.module.scratchpad {
   command                 = "alacritty --class spad", -- How to spawn the scratchpad
   rule                    = { instance = "spad" }, -- The rule that the scratchpad will be searched by
-  sticky                  = false, -- Whether the scratchpad should be sticky
-  autoclose               = true, -- Whether it should hide itself when losing focus
+  sticky                  = true, -- Whether the scratchpad should be sticky
+  autoclose               = false, -- Whether it should hide itself when losing focus
   floating                = true, -- Whether it should be floating (MUST BE TRUE FOR ANIMATIONS)
   geometry                = { x = 360, y = 90, height = 900, width = 1200 }, -- The geometry in a floating state
   reapply                 = true, -- Whether all those properties should be reapplied on every new opening of the scratchpad (MUST BE TRUE FOR ANIMATIONS)
