@@ -5,13 +5,12 @@
 
 --]]
 
-local gears = require("gears")
-local lain  = require("lain")
-local awful = require("awful")
-local wibox = require("wibox")
-local dpi   = require("beautiful.xresources").apply_dpi
--- local jira_widget = require("jira")
--- local weather_widget = require("weather")
+local gears          = require("gears")
+local lain           = require("lain")
+local awful          = require("awful")
+local wibox          = require("wibox")
+local dpi            = require("beautiful.xresources").apply_dpi
+local weather_widget = require("weather")
 
 local os = os
 local my_table = awful.util.table or gears.table -- 4.{0,1} compatibility
@@ -91,6 +90,19 @@ theme.titlebar_maximized_button_normal_inactive = theme.dir .. "/icons/titlebar/
 
 local markup = lain.util.markup
 local separators = lain.util.separators
+
+-- Get openweathermap API-key
+local ApiKeyFile = theme.dir .. "/openweathermap.apikey"
+local function get_api_key()
+  local file = io.open(ApiKeyFile, "rb")
+  if not file then
+    return nil
+  end
+  local content = file:read "*a"
+  content = string.gsub(content, "^%s*(.-)%s*$", "%1") -- strip off any space or newline
+  file:close()
+  return content
+end
 
 -- Textclock
 local clockicon = wibox.widget.imagebox(theme.widget_clock)
@@ -243,6 +255,10 @@ function theme.at_screen_connect(s)
       brightwidget,
       clockicon,
       clock,
+      weather_widget({
+        api_key=get_api_key(),
+        coordinates = {59.3293, 18.0686},
+      }),
       spr,
       wibox.widget.systray(),
       spr,
