@@ -1,111 +1,75 @@
---[[
-
-     Based on
-     Powerarrow Dark Awesome WM theme
-
---]]
-
 local gears          = require("gears")
 local lain           = require("lain")
 local awful          = require("awful")
 local wibox          = require("wibox")
 local dpi            = require("beautiful.xresources").apply_dpi
 local weather_widget = require("weather")
+-- require("wifi")
 
 local os = os
 local my_table = awful.util.table or gears.table -- 4.{0,1} compatibility
 
-local theme                                     = {}
-theme.dir                                       = os.getenv("HOME") .. "/.config/awesome"
-theme.wallpaper                                 = os.getenv("WALLPAPER")
-theme.font                                      = "Arimo Nerd Font 11"
-theme.fg_normal                                 = "#d6deeb"
-theme.fg_focus                                  = "#6fc3ea"
-theme.fg_urgent                                 = "#CC9393"
-theme.bg_normal                                 = "#24292e"
-theme.bg_focus                                  = "#000000"
-theme.bg_occupied                               = "#444b52"
-theme.bg_urgent                                 = "#1A1A1A"
-theme.bg_systray                                = theme.bg_normal
-theme.border_width                              = dpi(2)
-theme.border_normal                             = "#3F3F3F"
-theme.border_focus                              = "#7F7F7F"
-theme.border_marked                             = "#CC9393"
-theme.tasklist_bg_focus                         = theme.bg_normal
-theme.titlebar_bg_focus                         = theme.bg_focus
-theme.titlebar_bg_normal                        = theme.bg_normal
-theme.titlebar_fg_focus                         = theme.fg_focus
-theme.menu_height                               = dpi(28)
-theme.menu_width                                = dpi(200)
-theme.layout_tile                               = theme.dir .. "/icons/tile.png"
-theme.layout_tileleft                           = theme.dir .. "/icons/tileleft.png"
-theme.layout_tilebottom                         = theme.dir .. "/icons/tilebottom.png"
-theme.layout_tiletop                            = theme.dir .. "/icons/tiletop.png"
-theme.layout_fairv                              = theme.dir .. "/icons/fairv.png"
-theme.layout_fairh                              = theme.dir .. "/icons/fairh.png"
-theme.layout_spiral                             = theme.dir .. "/icons/spiral.png"
-theme.layout_dwindle                            = theme.dir .. "/icons/dwindle.png"
-theme.layout_max                                = theme.dir .. "/icons/max.png"
-theme.layout_fullscreen                         = theme.dir .. "/icons/fullscreen.png"
-theme.layout_magnifier                          = theme.dir .. "/icons/magnifier.png"
-theme.layout_floating                           = theme.dir .. "/icons/floating.png"
-theme.layout_termfair                           = theme.dir .. "/icons/termfair.png"
-theme.layout_treetile                           = theme.dir .. "/icons/treetile.png"
-theme.widget_ac                                 = theme.dir .. "/icons/ac.png"
-theme.widget_battery                            = theme.dir .. "/icons/battery.png"
-theme.widget_battery_low                        = theme.dir .. "/icons/battery_low.png"
-theme.widget_battery_empty                      = theme.dir .. "/icons/battery_empty.png"
-theme.widget_brightness                         = theme.dir .. "/icons/brightness.png"
-theme.widget_clock                              = theme.dir .. "/icons/clock.png"
-theme.widget_music                              = theme.dir .. "/icons/note.png"
-theme.widget_music_on                           = theme.dir .. "/icons/note_on.png"
-theme.widget_vol                                = theme.dir .. "/icons/vol.png"
-theme.widget_vol_low                            = theme.dir .. "/icons/vol_low.png"
-theme.widget_vol_no                             = theme.dir .. "/icons/vol_no.png"
-theme.widget_vol_mute                           = theme.dir .. "/icons/vol_mute.png"
-theme.widget_mail                               = theme.dir .. "/icons/mail.png"
-theme.widget_mail_on                            = theme.dir .. "/icons/mail_on.png"
-theme.widget_weather                            = theme.dir .. "/icons/dish.png"
-theme.tasklist_plain_task_name                  = true
-theme.tasklist_disable_icon                     = true
-theme.useless_gap                               = dpi(9)
-theme.titlebar_close_button_focus               = theme.dir .. "/icons/titlebar/close_focus.png"
-theme.titlebar_close_button_normal              = theme.dir .. "/icons/titlebar/close_normal.png"
-theme.titlebar_ontop_button_focus_active        = theme.dir .. "/icons/titlebar/ontop_focus_active.png"
-theme.titlebar_ontop_button_normal_active       = theme.dir .. "/icons/titlebar/ontop_normal_active.png"
-theme.titlebar_ontop_button_focus_inactive      = theme.dir .. "/icons/titlebar/ontop_focus_inactive.png"
-theme.titlebar_ontop_button_normal_inactive     = theme.dir .. "/icons/titlebar/ontop_normal_inactive.png"
-theme.titlebar_sticky_button_focus_active       = theme.dir .. "/icons/titlebar/sticky_focus_active.png"
-theme.titlebar_sticky_button_normal_active      = theme.dir .. "/icons/titlebar/sticky_normal_active.png"
-theme.titlebar_sticky_button_focus_inactive     = theme.dir .. "/icons/titlebar/sticky_focus_inactive.png"
-theme.titlebar_sticky_button_normal_inactive    = theme.dir .. "/icons/titlebar/sticky_normal_inactive.png"
-theme.titlebar_floating_button_focus_active     = theme.dir .. "/icons/titlebar/floating_focus_active.png"
-theme.titlebar_floating_button_normal_active    = theme.dir .. "/icons/titlebar/floating_normal_active.png"
-theme.titlebar_floating_button_focus_inactive   = theme.dir .. "/icons/titlebar/floating_focus_inactive.png"
-theme.titlebar_floating_button_normal_inactive  = theme.dir .. "/icons/titlebar/floating_normal_inactive.png"
-theme.titlebar_maximized_button_focus_active    = theme.dir .. "/icons/titlebar/maximized_focus_active.png"
-theme.titlebar_maximized_button_normal_active   = theme.dir .. "/icons/titlebar/maximized_normal_active.png"
-theme.titlebar_maximized_button_focus_inactive  = theme.dir .. "/icons/titlebar/maximized_focus_inactive.png"
-theme.titlebar_maximized_button_normal_inactive = theme.dir .. "/icons/titlebar/maximized_normal_inactive.png"
+local theme                    = {}
+theme.dir                      = os.getenv("HOME") .. "/.config/awesome"
+theme.wallpaper                = os.getenv("WALLPAPER")
+theme.font                     = "Arimo Nerd Font 11"
+theme.fg_normal                = "#d6deeb"
+theme.fg_focus                 = "#6fc3ea"
+theme.fg_urgent                = "#CC9393"
+theme.bg_normal                = "#24292e"
+theme.bg_focus                 = "#000000"
+theme.bg_occupied              = "#444b52"
+theme.bg_urgent                = "#1A1A1A"
+theme.bg_systray               = theme.bg_normal
+theme.border_width             = dpi(2)
+theme.border_normal            = "#3F3F3F"
+theme.border_focus             = "#7F7F7F"
+theme.border_marked            = "#CC9393"
+theme.tasklist_bg_focus        = theme.bg_normal
+theme.titlebar_bg_focus        = theme.bg_focus
+theme.titlebar_bg_normal       = theme.bg_normal
+theme.titlebar_fg_focus        = theme.fg_focus
+theme.menu_height              = dpi(28)
+theme.menu_width               = dpi(200)
+theme.bar_height               = dpi(20)
+theme.layout_tile              = theme.dir .. "/icons/tile.png"
+theme.layout_tileleft          = theme.dir .. "/icons/tileleft.png"
+theme.layout_tilebottom        = theme.dir .. "/icons/tilebottom.png"
+theme.layout_tiletop           = theme.dir .. "/icons/tiletop.png"
+theme.layout_fairv             = theme.dir .. "/icons/fairv.png"
+theme.layout_fairh             = theme.dir .. "/icons/fairh.png"
+theme.layout_spiral            = theme.dir .. "/icons/spiral.png"
+theme.layout_dwindle           = theme.dir .. "/icons/dwindle.png"
+theme.layout_max               = theme.dir .. "/icons/max.png"
+theme.layout_fullscreen        = theme.dir .. "/icons/fullscreen.png"
+theme.layout_magnifier         = theme.dir .. "/icons/magnifier.png"
+theme.layout_floating          = theme.dir .. "/icons/floating.png"
+theme.layout_termfair          = theme.dir .. "/icons/termfair.png"
+theme.layout_treetile          = theme.dir .. "/icons/treetile.png"
+theme.tasklist_plain_task_name = true
+theme.tasklist_disable_icon    = true
+theme.useless_gap              = dpi(9)
 
 local markup = lain.util.markup
 local separators = lain.util.separators
 
 -- Get openweathermap API-key
-local ApiKeyFile = theme.dir .. "/openweathermap.apikey"
-local function get_api_key()
-  local file = io.open(ApiKeyFile, "rb")
-  if not file then
+local api_key = theme.dir .. "/openweathermap.apikey"
+local current_location = theme.dir .. "/current_location"
+local function get_data(file)
+  local f = io.open(file, "rb")
+  if not f then
     return nil
   end
-  local content = file:read "*a"
+  local content = f:read "*a"
   content = string.gsub(content, "^%s*(.-)%s*$", "%1") -- strip off any space or newline
-  file:close()
+  f:close()
   return content
 end
 
 -- Textclock
-local clockicon = wibox.widget.imagebox(theme.widget_clock)
+-- local clockicon = wibox.widget.imagebox(theme.widget_clock)
+local clockicon = wibox.widget.textbox("󰃰 ")
 local clock = awful.widget.watch(
   "date +'%a %d %b %R' ", 60,
   function(widget, stdout)
@@ -114,39 +78,55 @@ local clock = awful.widget.watch(
 )
 
 -- Battery
-local baticon = wibox.widget.imagebox(theme.widget_battery)
+local baticon = wibox.widget.textbox("󰁹 ")
 local bat = lain.widget.bat({
   settings = function()
     if bat_now.status and bat_now.status ~= "N/A" then
       if bat_now.ac_status == 1 then
-        baticon:set_image(theme.widget_ac)
-      elseif not bat_now.perc and tonumber(bat_now.perc) <= 5 then
-        baticon:set_image(theme.widget_battery_empty)
-      elseif not bat_now.perc and tonumber(bat_now.perc) <= 15 then
-        baticon:set_image(theme.widget_battery_low)
+        baticon.text = "󰚥 "
+      elseif tonumber(bat_now.perc) >= 90  and tonumber(bat_now.perc) <= 99 then
+        baticon.text = "󰁹 "
+      elseif tonumber(bat_now.perc) >= 80  and tonumber(bat_now.perc) <= 89 then
+        baticon.text = "󰂂 "
+      elseif tonumber(bat_now.perc) >= 70  and tonumber(bat_now.perc) <= 79 then
+        baticon.text = "󰂁 "
+      elseif tonumber(bat_now.perc) >= 60  and tonumber(bat_now.perc) <= 69 then
+        baticon.text = "󰂀 "
+      elseif tonumber(bat_now.perc) >= 50  and tonumber(bat_now.perc) <= 59 then
+        baticon.text = "󰁿 "
+      elseif tonumber(bat_now.perc) >= 40  and tonumber(bat_now.perc) <= 49 then
+        baticon.text = "󰁾 "
+      elseif tonumber(bat_now.perc) >= 30  and tonumber(bat_now.perc) <= 39 then
+        baticon.text = "󰁽 "
+      elseif tonumber(bat_now.perc) >= 20  and tonumber(bat_now.perc) <= 29 then
+        baticon.text = "󰁻 "
+      elseif tonumber(bat_now.perc) >= 10  and tonumber(bat_now.perc) <= 19 then
+        baticon.text = "󰁻 "
+      elseif tonumber(bat_now.perc) >= 5 and tonumber(bat_now.perc) <= 9 then
+        baticon.text = "󰁺 "
       else
-        baticon:set_image(theme.widget_battery)
+        baticon.text = "󰂃 "
       end
       widget:set_markup(markup.font(theme.font, " " .. bat_now.perc .. "% "))
     else
       widget:set_markup(markup.font(theme.font, " AC "))
-      baticon:set_image(theme.widget_ac)
+      baticon.text = "󰚥 "
     end
   end
 })
 
 -- PulseAudio volume
-local volicon = wibox.widget.imagebox(theme.widget_vol)
+local volicon = wibox.widget.textbox("󰕿 ")
 local volume = lain.widget.pulse({
   settings = function()
     if volume_now.muted == "yes" then
-      volicon:set_image(theme.widget_vol_mute)
+      volicon.text = "󰖁 "
     elseif tonumber(volume_now.left) == 0 then
-      volicon:set_image(theme.widget_vol_no)
+      volicon.text = "󰕿 "
     elseif tonumber(volume_now.left) <= 50 then
-      volicon:set_image(theme.widget_vol_low)
+      volicon.text = "󰖀 "
     else
-      volicon:set_image(theme.widget_vol)
+      volicon.text = "󰕾 "
     end
 
     widget:set_markup(markup.font(theme.font, " " .. volume_now.left .. "% "))
@@ -154,10 +134,17 @@ local volume = lain.widget.pulse({
 })
 
 -- Brightness
-local brighticon = wibox.widget.imagebox(theme.widget_brightness)
+local brighticon = wibox.widget.textbox(theme.widget_brightness)
 local brightwidget = awful.widget.watch('light -G', 0.1,
   function(widget, stdout, stderr, exitreason, exitcode)
     local brightness_level = tonumber(string.format("%.0f", stdout))
+    if brightness_level >= 76 and brightness_level <= 100 then
+      brighticon.text = "󰃠 "
+    elseif brightness_level>= 21 and brightness_level <= 75 then
+      brighticon.text = "󰃟 "
+    elseif brightness_level <= 20 then
+      brighticon.text = "󰃞 "
+    end
     widget:set_markup(markup.font(theme.font, " " .. brightness_level .. "% "))
   end)
 
@@ -228,12 +215,12 @@ function theme.at_screen_connect(s)
       widget = wibox.container.background,
     },
   })
-  --
+
   -- Create a tasklist widget
   s.mytasklist = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, awful.util.tasklist_buttons)
 
   -- Create the wibox
-  s.mywibox = awful.wibar({ position = "top", screen = s, height = dpi(20), bg = theme.bg_normal, fg = theme.fg_normal })
+  s.mywibox = awful.wibar({ position = "top", screen = s, height = theme.bar_height, bg = theme.bg_normal, fg = theme.fg_normal })
 
   -- Add widgets to the wibox
   s.mywibox:setup {
@@ -256,8 +243,9 @@ function theme.at_screen_connect(s)
       clockicon,
       clock,
       weather_widget({
-        api_key=get_api_key(),
-        coordinates = {59.3293, 18.0686},
+        api_key=get_data(api_key),
+        coordinates={59.3293, 18.0686},
+        show_daily_forecast=true,
       }),
       spr,
       wibox.widget.systray(),
