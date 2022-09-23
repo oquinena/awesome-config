@@ -371,19 +371,19 @@ globalkeys = my_table.join(
 
   -- PulseAudio volume control
   awful.key({}, "XF86AudioRaiseVolume", function()
-    awful.util.spawn("pactl set-sink-volume @DEFAULT_SINK@ +10%", false)
+    os.execute(string.format("pactl set-sink-volume @DEFAULT_SINK@ +10%%"))
   end,
     { description = "volume up", group = "hotkeys" }),
   awful.key({}, "XF86AudioLowerVolume", function()
-    awful.util.spawn("pactl set-sink-volume @DEFAULT_SINK@ -10%", false)
+    os.execute(string.format("pactl set-sink-volume @DEFAULT_SINK@ -10%%"))
   end,
     { description = "volume down", group = "hotkeys" }),
   awful.key({}, "XF86AudioMute", function()
-    awful.util.spawn("pactl set-sink-mute @DEFAULT_SINK@ toggle", false)
+    os.execute(string.format("pactl set-sink-mute @DEFAULT_SINK@ toggle"))
   end,
     { description = "volume mute", group = "hotkeys" }),
   awful.key({}, "XF86AudioMicMute", function()
-    awful.util.spawn("pactl set-source-mute 1 toggle", false)
+    os.execute(string.format("pactl set-source-mute 1 toggle"))
   end,
     { description = "microphone mute", group = "hotkeys" }),
 
