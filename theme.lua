@@ -67,85 +67,93 @@ local function get_data(file)
   return content
 end
 
--- Textclock
--- local clockicon = wibox.widget.imagebox(theme.widget_clock)
-local clockicon = wibox.widget.textbox("󰅐 ")
-local clock = awful.widget.watch(
-  "date +'%a %d %b %R' ", 60,
+-- Display SSID of currently connected wifi
+wifi_widget = wibox.widget.textbox()
+awful.widget.watch("ssid.sh", 3,
+    function(widget, stdout, stderr, exitreason, exitcode)
+    local wifi = stdout
+    if(wifi == '' or wifi==nil ) then
+        widget:set_markup(markup.font(theme.font,"󰖩 Not connected " ))
+    else
+        widget:set_markup(markup.font(theme.font,"󰖩 " .. wifi .. "      "))
+    end
+end,
+wifi_widget
+)
+
+-- Date and time
+local clock = awful.widget.watch("date +'%a %d %b %R' ", 60,
   function(widget, stdout)
-    widget:set_markup(" " .. markup.font(theme.font, stdout))
+    widget:set_markup(" " .. markup.font(theme.font, "󰅐 " .. stdout))
   end
 )
 
 -- Battery
-local baticon = wibox.widget.textbox("󰁹 ")
 local bat = lain.widget.bat({
   settings = function()
     if bat_now.status and bat_now.status ~= "N/A" then
       if bat_now.ac_status == 1 then
-        baticon.text = "󰚥 "
+        icon = "󰚥 "
       elseif tonumber(bat_now.perc) >= 90  and tonumber(bat_now.perc) <= 99 then
-        baticon.text = "󰁹 "
+        icon = "󰁹 "
       elseif tonumber(bat_now.perc) >= 80  and tonumber(bat_now.perc) <= 89 then
-        baticon.text = "󰂂 "
+        icon = "󰂂 "
       elseif tonumber(bat_now.perc) >= 70  and tonumber(bat_now.perc) <= 79 then
-        baticon.text = "󰂁 "
+        icon = "󰂁 "
       elseif tonumber(bat_now.perc) >= 60  and tonumber(bat_now.perc) <= 69 then
-        baticon.text = "󰂀 "
+        icon = "󰂀 "
       elseif tonumber(bat_now.perc) >= 50  and tonumber(bat_now.perc) <= 59 then
-        baticon.text = "󰁿 "
+        icon = "󰁿 "
       elseif tonumber(bat_now.perc) >= 40  and tonumber(bat_now.perc) <= 49 then
-        baticon.text = "󰁾 "
+        icon = "󰁾 "
       elseif tonumber(bat_now.perc) >= 30  and tonumber(bat_now.perc) <= 39 then
-        baticon.text = "󰁽 "
+        icon = "󰁽 "
       elseif tonumber(bat_now.perc) >= 20  and tonumber(bat_now.perc) <= 29 then
-        baticon.text = "󰁻 "
+        icon = "󰁻 "
       elseif tonumber(bat_now.perc) >= 10  and tonumber(bat_now.perc) <= 19 then
-        baticon.text = "󰁻 "
+        icon = "󰁻 "
       elseif tonumber(bat_now.perc) >= 5 and tonumber(bat_now.perc) <= 9 then
-        baticon.text = "󰁺 "
+        icon = "󰁺 "
       else
-        baticon.text = "󰂃 "
+        icon = "󰂃 "
       end
-      widget:set_markup(markup.font(theme.font, " " .. bat_now.perc .. "% "))
+      widget:set_markup(markup.font(theme.font, icon .. bat_now.perc .. "% "))
     else
-      widget:set_markup(markup.font(theme.font, " AC "))
-      baticon.text = "󰚥 "
+      icon = "󰚥 "
+      widget:set_markup(markup.font(theme.font, icon .. " AC "))
     end
   end
 })
 
 -- PulseAudio volume
-local volicon = wibox.widget.textbox("󰕿 ")
 local volume = lain.widget.pulse({
   settings = function()
     if volume_now.muted == "yes" then
-      volicon.text = "󰖁 "
+      icon = "󰖁 "
     elseif tonumber(volume_now.left) == 0 then
-      volicon.text = "󰕿 "
+      icon = "󰕿 "
     elseif tonumber(volume_now.left) <= 50 then
-      volicon.text = "󰖀 "
+      icon = "󰖀 "
     else
-      volicon.text = "󰕾 "
+      icon = "󰕾 "
     end
 
-    widget:set_markup(markup.font(theme.font, " " .. volume_now.left .. "% "))
+    widget:set_markup(markup.font(theme.font, icon .. volume_now.left .. "% "))
   end
 })
 
 -- Brightness
-local brighticon = wibox.widget.textbox(theme.widget_brightness)
 local brightwidget = awful.widget.watch('light -G', 0.1,
   function(widget, stdout, stderr, exitreason, exitcode)
     local brightness_level = tonumber(string.format("%.0f", stdout))
     if brightness_level >= 76 and brightness_level <= 100 then
-      brighticon.text = "󰃠 "
+      icon = "󰃠 "
     elseif brightness_level>= 21 and brightness_level <= 75 then
-      brighticon.text = "󰃟 "
+      icon = "󰃟 "
     elseif brightness_level <= 20 then
-      brighticon.text = "󰃞 "
+      icon = "󰃞 "
     end
-    widget:set_markup(markup.font(theme.font, " " .. brightness_level .. "% "))
+    widget:set_markup(markup.font(theme.font, icon .. brightness_level .. "% "))
   end)
 
 -- Separators
@@ -234,19 +242,17 @@ function theme.at_screen_connect(s)
     s.mytasklist, -- Middle widget
     { -- Right widgets
       layout = wibox.layout.fixed.horizontal,
-      volicon,
       volume,
-      baticon,
       bat.widget,
-      brighticon,
       brightwidget,
-      clockicon,
-      clock,
       weather_widget({
         api_key=get_data(api_key),
         coordinates={59.3293, 18.0686},
         show_daily_forecast=true,
       }),
+      -- wifi_widget,
+      -- spr,
+      clock,
       spr,
       wibox.widget.systray(),
       spr,
