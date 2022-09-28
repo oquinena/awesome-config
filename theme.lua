@@ -153,7 +153,7 @@ local brightwidget = awful.widget.watch('light -G', 0.1,
     elseif brightness_level <= 20 then
       icon = "󰃞 "
     end
-    widget:set_markup(markup.font(theme.font, icon .. brightness_level .. "% "))
+    widget:set_markup(markup.font(theme.font, icon .. brightness_level .. "%"))
   end)
 
 -- Separators
