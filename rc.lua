@@ -53,9 +53,8 @@ local modkey     = "Mod4"
 local altkey     = "Mod1"
 local terminal   = "alacritty"
 local editor     = os.getenv("EDITOR") or "vim"
-local gui_editor = "neovide"
 local browser    = "MOZ_DBUS_REMOTE=1 firefox"
-local guieditor  = "neovide"
+local guieditor  = "vscode"
 local scrlocker  = "betterlockscreen -l dim"
 
 awful.util.terminal = terminal
@@ -67,7 +66,7 @@ awful.layout.layouts = {
   -- awful.layout.suit.tile.bottom,
   -- awful.layout.suit.floating,
   -- awful.layout.suit.tile.top,
-  -- awful.layout.suit.fair,
+  awful.layout.suit.fair,
   -- awful.layout.suit.fair.horizontal,
   -- awful.layout.suit.spiral,
   -- awful.layout.suit.spiral.dwindle,
@@ -186,6 +185,17 @@ local term_scratch = bling.module.scratchpad {
   reapply                 = true, -- Whether all those properties should be reapplied on every new opening of the scratchpad (MUST BE TRUE FOR ANIMATIONS)
   dont_focus_before_close = false, -- When set to true, the scratchpad will be closed by the toggle function regardless of whether its focused or not. When set to false, the toggle function will first bring the scratchpad into focus and only close it on a second call
 }
+local slack_scratch = bling.module.scratchpad {
+  command                 = "slack", -- How to spawn the scratchpad
+  rule                    = { instance = "slack" }, -- The rule that the scratchpad will be searched by
+  sticky                  = true, -- Whether the scratchpad should be sticky
+  autoclose               = false, -- Whether it should hide itself when losing focus
+  floating                = true, -- Whether it should be floating (MUST BE TRUE FOR ANIMATIONS)
+  ontop                   = true,
+  geometry                = { x = 180, y = 90, height = 900, width = 1500 }, -- The geometry in a floating state
+  reapply                 = true, -- Whether all those properties should be reapplied on every new opening of the scratchpad (MUST BE TRUE FOR ANIMATIONS)
+  dont_focus_before_close = false, -- When set to true, the scratchpad will be closed by the toggle function regardless of whether its focused or not. When set to false, the toggle function will first bring the scratchpad into focus and only close it on a second call
+}
 -- }}}
 
 -- {{{ Screen
@@ -240,9 +250,11 @@ globalkeys = my_table.join(
   awful.key({ modkey, "Control" }, "m", function() xrandr.xrandr() end,
     { description = "Toggle xrandr", group = "hotkeys" }),
 
-  -- scratchpad
+  -- scratchpads
   awful.key({ modkey, }, "u", function() term_scratch:toggle() end,
-    { description = "Scratchpad", group = "hotkeys" }),
+    { description = "Scratchpad terminal", group = "hotkeys" }),
+  awful.key({ modkey, }, "i", function() slack_scratch:toggle() end,
+    { description = "Slack", group = "hotkeys" }),
 
   -- Hotkeys
   awful.key({ modkey, }, "s", hotkeys_popup.show_help,
@@ -600,5 +612,5 @@ end
 
 spawn_on_tag("MOZ_DBUS_REMOTE=1 firefox -P Private", "firefox", screen[1].tags[1], "class")
 spawn_on_tag("MOZ_DBUS_REMOTE=1 firefox -P Work", "firefox", screen[1].tags[1], "class")
-spawn_on_tag("slack", "Slack", screen[1].tags[2], "class")
-spawn_on_tag(terminal, "Alacritty", screen[1].tags[3], "class")
+-- spawn_on_tag("slack", "Slack", screen[1].tags[2], "class")
+spawn_on_tag(terminal, "Alacritty", screen[1].tags[2], "class")
