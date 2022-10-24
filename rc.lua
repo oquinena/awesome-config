@@ -54,7 +54,7 @@ local altkey     = "Mod1"
 local terminal   = "alacritty"
 local editor     = os.getenv("EDITOR") or "vim"
 local browser    = "MOZ_DBUS_REMOTE=1 firefox"
-local guieditor  = "vscode"
+local guieditor  = "code"
 local scrlocker  = "betterlockscreen -l dim"
 
 awful.util.terminal = terminal
