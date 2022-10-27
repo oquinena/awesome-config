@@ -127,6 +127,7 @@ local bat = lain.widget.bat({
 
 -- PulseAudio volume
 local volume = lain.widget.pulse({
+  cmd = "pacmd list-sinks | grep -e $(pactl info | grep -e 'ink' | cut -d' ' -f3) -e 'volume: front' -e 'muted' | sed -e '1,6d'",
   settings = function()
     if volume_now.muted == "yes" then
       icon = "󰖁 "
