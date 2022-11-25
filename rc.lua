@@ -561,8 +561,14 @@ awful.rules.rules = {
 
   { rule = { class = "Gimp", role = "gimp-image-window" },
     properties = { maximized = true } },
+
+  -- Zoom
+  { rule = { name = "zoom" },
+    properties = { floating = true, titlebars_enabled = false } },
+  { rule = { name = "Zoom Meeting" },
+    properties = { floating = true, titlebars_enabled = false } },
 },
-    -- }}}
+-- }}}
 
     -- Enable sloppy focus, so that focus follows mouse.
     client.connect_signal("mouse::enter", function(c)
