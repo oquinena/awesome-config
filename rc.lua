@@ -19,6 +19,7 @@ local my_table      = awful.util.table or gears.table -- 4.{0,1} compatibility
 local dpi           = require("beautiful.xresources").apply_dpi
 local revelation    = require("revelation")
 local bling         = require("bling")
+local mouse_focus   = require("mouse_follow_focus")
 -- }}}
 
 -- {{{ Error handling
@@ -49,13 +50,14 @@ end
 naughty.config.defaults.ontop = true
 -- }}}
 
-local modkey     = "Mod4"
-local altkey     = "Mod1"
-local terminal   = "alacritty"
-local editor     = os.getenv("EDITOR") or "vim"
-local browser    = "MOZ_DBUS_REMOTE=1 firefox"
-local guieditor  = "code"
-local scrlocker  = "betterlockscreen -l dim"
+local modkey              = "Mod4"
+local altkey              = "Mod1"
+local terminal            = "alacritty"
+local editor              = os.getenv("EDITOR") or "vim"
+local browser             = "MOZ_DBUS_REMOTE=1 firefox"
+local guieditor           = "code"
+local scrlocker           = "betterlockscreen -l dim"
+local password_generator  = "/home/nomad/go/bin/go-pass"
 
 awful.util.terminal = terminal
 awful.util.tagnames = { "1", "2", "3", "4", "5" }
@@ -408,11 +410,18 @@ globalkeys = my_table.join(
     { description = "run calculator", group = "launcher" }),
   awful.key({ modkey, "Shift" }, "m", function() awful.spawn("toggle_touchpad.sh") end,
     { description = "Toggle touchpad active/inactive", group = "hotkeys" }),
-  awful.key({ modkey }, "v", function() awful.spawn("go-pass") end,
+  awful.key({ modkey }, "v", function() awful.spawn(password_generator) end,
     { description = "Generate password and place in clipboard buffer", group = "launcher" }),
 
   -- Prompt
-  awful.key({ modkey }, "r", function() awful.screen.focused().mypromptbox:run() end,
+  -- awful.key({ modkey }, "r", function() awful.screen.focused().mypromptbox:run() end,
+  --   { description = "run prompt", group = "launcher" }),
+  -- Rofi promt 
+  awful.key({ modkey }, "r", function() awful.spawn("rofi -show run") end,
+    { description = "run prompt", group = "launcher" }),
+
+  -- Rofi greenclip 
+  awful.key({ altkey, "Control" }, "h", function() awful.spawn("rofi -modi 'clipboard:greenclip print' -show clipboard -run-command '{cmd}'") end,
     { description = "run prompt", group = "launcher" }),
 
   awful.key({ modkey }, "x", function()
