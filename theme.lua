@@ -17,16 +17,16 @@ theme.fg_normal = "#cdd6f4"
 theme.fg_focus = "#b4befe"
 theme.fg_urgent = "#181825"
 theme.fg_occupied = "#181825"
-theme.bg_normal = "#1e1e2e"
+theme.bg_normal = "#1e222a"
 -- theme.bg_normal                = "#24292e"
-theme.bg_focus = "#fab387"
-theme.bg_occupied = "#b4befe"
-theme.bg_urgent = "#f38ba8"
+theme.bg_focus = "#81a1c1"
+theme.bg_occupied = "#5e81ac"
+theme.bg_urgent = "#d08770"
 theme.bg_systray = theme.bg_normal
-theme.border_width = dpi(2)
-theme.border_normal = "#3F3F3F"
-theme.border_focus = "#7F7F7F"
-theme.border_marked = "#CC9393"
+theme.border_width = dpi(1)
+theme.border_normal = "#1e1e2e"
+theme.border_focus = "#b4befe"
+theme.border_marked = "#1e222a"
 theme.tasklist_bg_focus = theme.bg_normal
 theme.titlebar_bg_focus = theme.bg_focus
 theme.titlebar_bg_normal = theme.bg_normal
@@ -69,16 +69,25 @@ local function get_data(file)
 	return content
 end
 
--- Display SSID of currently connected wifi
-wifi_widget = wibox.widget.textbox()
-awful.widget.watch("ssid.sh", 3, function(widget, stdout, stderr, exitreason, exitcode)
+-- Current ssid
+local ssid = awful.widget.watch("ssid.sh", 3, function(widget, stdout)
 	local wifi = stdout
 	if wifi == "" or wifi == nil then
 		widget:set_markup(markup.font(theme.font, "󰖩 Not connected "))
 	else
-		widget:set_markup(markup.font(theme.font, "󰖩 " .. wifi .. "      "))
+		widget:set_markup(markup.font(theme.font, "󰖩 " .. wifi))
 	end
-end, wifi_widget)
+end)
+
+-- Current ssid
+local wifi = awful.widget.watch("nmcli -t -f active,ssid dev wifi", 3, function(widget, stdout)
+	local w = stdout
+	if w == "" or w == nil then
+		widget:set_markup(markup.font(theme.font, "󰖩 Not connected"))
+	else
+		widget:set_markup(markup.font(theme.font, "󰖩 " .. w))
+	end
+end)
 
 -- Date and time
 local clock = awful.widget.watch("date +'%a %d %b %R' ", 60, function(widget, stdout)
@@ -114,17 +123,17 @@ local bat = lain.widget.bat({
 			else
 				icon = "󰂃 "
 			end
-			widget:set_markup(markup.font(theme.font, icon .. bat_now.perc .. "% "))
+			widget:set_markup(markup.font(theme.font, icon .. bat_now.perc .. "%"))
 		else
 			icon = "󰚥 "
-			widget:set_markup(markup.font(theme.font, icon .. " AC "))
+			widget:set_markup(markup.font(theme.font, icon .. "AC"))
 		end
 	end,
 })
 
 -- Pulseaudio
-local volume = awful.widget.watch("pactl get-sink-volume @DEFAULT_SINK@", 0.1, function (widget, stdout, _, _, _)
-    local vol_level = tonumber(string.match(stdout, "%d*%%"):sub(1, -2))
+local volume = awful.widget.watch("pactl get-sink-volume @DEFAULT_SINK@", 0.1, function(widget, stdout, _, _, _)
+	local vol_level = tonumber(string.match(stdout, "%d*%%"):sub(1, -2))
 	if vol_level >= 76 then
 		Icon = " "
 	elseif vol_level >= 21 and vol_level <= 75 then
@@ -133,10 +142,14 @@ local volume = awful.widget.watch("pactl get-sink-volume @DEFAULT_SINK@", 0.1, f
 		Icon = " "
 	end
 	widget:set_markup(markup.font(theme.font, Icon .. vol_level .. "%"))
-    
-end
+end)
 
-)
+-- Gentoo updates
+local updates = awful.widget.watch("cat /home/nomad/.local/share/daniel/available-upgrades", 1, function(widget, stdout)
+	local updates_available = tonumber(stdout)
+	Icon = " "
+	widget:set_markup(markup.font(theme.font, Icon .. updates_available))
+end)
 
 -- Brightness
 local brightwidget = awful.widget.watch("light -G", 0.1, function(widget, stdout, _, _, _)
@@ -198,12 +211,12 @@ function theme.at_screen_connect(s)
 			bg_focus = theme.bg_focus,
 			fg_urgent = theme.fg_occupied,
 			bg_urgent = theme.bg_urgent,
-			-- bg_occupied = theme.bg_occupied,
-			-- fg_occupied = theme.fg_occupied,
+			bg_occupied = theme.bg_occupied,
+			fg_occupied = theme.fg_occupied,
 			bg_empty = nil,
 			fg_empty = nil,
 			spacing = 3,
-			-- shape = gears.shape.rounded_rect,
+			shape = gears.shape.circle,
 		},
 		widget_template = {
 			{
@@ -256,25 +269,28 @@ function theme.at_screen_connect(s)
 		{
 			-- Right widgets
 			layout = wibox.layout.fixed.horizontal,
+			ssid,
+			spr,
+			updates,
+			spr,
 			bat.widget,
 			spr,
 			volume,
 			spr,
 			brightwidget,
-			spr,
 			weather_widget({
 				api_key = get_data(api_key),
 				coordinates = { 62.5464, 12.5419 },
 				show_daily_forecast = true,
 			}),
-			spr,
+			-- spr,
 			-- wifi_widget,
 			-- spr,
 			clock,
 			spr,
 			wibox.widget.systray(),
-			spr,
-			s.mylayoutbox,
+			-- spr,
+			-- s.mylayoutbox,
 		},
 	})
 end
