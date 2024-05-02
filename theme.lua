@@ -97,6 +97,7 @@ end)
 -- Battery
 local bat = lain.widget.bat({
 	settings = function()
+    local icon
 		if bat_now.status and bat_now.status ~= "N/A" then
 			if bat_now.ac_status == 1 then
 				icon = "󰚥 "
@@ -135,7 +136,7 @@ local bat = lain.widget.bat({
 local volume = awful.widget.watch("pactl get-sink-volume @DEFAULT_SINK@", 0.1, function(widget, stdout, _, _, _)
 	local vol_level = tonumber(string.match(stdout, "%d*%%"):sub(1, -2))
 	if vol_level >= 76 then
-		Icon = " "
+		Icon = "  "
 	elseif vol_level >= 21 and vol_level <= 75 then
 		Icon = " "
 	elseif vol_level <= 20 then
