@@ -1,30 +1,22 @@
 pcall(require, "luarocks.loader")
 
--- {{{ Required libraries
-local awesome, client, mouse, screen, tag = awesome, client, mouse, screen, tag
-local ipairs, string, os, table, tostring, tonumber, type = ipairs, string, os, table, tostring, tonumber, type
-
-local gears = require("gears")
-local awful = require("awful")
-require("awful.autofocus")
--- local wibox = require("wibox")
-local beautiful = require("beautiful")
-local naughty = require("naughty")
-local lain = require("lain")
--- local xrandr = require("xrandr")
-local freedesktop = require("freedesktop")
+local awesome       = awesome
+local client        = client
+local screen        = screen
+local gears         = require("gears")
+local awful         = require("awful")
+local config_table  = awful.util.table
+local beautiful     = require("beautiful")
+local naughty       = require("naughty")
+local lain          = require("lain")
 local hotkeys_popup = require("awful.hotkeys_popup").widget
-require("awful.hotkeys_popup.keys")
-local my_table = awful.util.table or gears.table -- 4.{0,1} compatibility
-local dpi = require("beautiful.xresources").apply_dpi
--- local revelation = require("revelation")
-local bling = require("bling")
--- local mouse_focus = require("mouse_follow_focus")
--- }}}
+local dpi           = require("beautiful.xresources").apply_dpi
+local bling         = require("bling")
+local theme         = require("theme")
+                      require("awful.autofocus")
+                      require("awful.hotkeys_popup.keys")
 
 -- {{{ Error handling
--- Check if awesome encountered an error during startup and fell back to
--- another config (This code will only ever execute for the fallback config)
 if awesome.startup_errors then
 	naughty.notify({
 		preset = naughty.config.presets.critical,
@@ -32,8 +24,9 @@ if awesome.startup_errors then
 		text = awesome.startup_errors,
 	})
 end
+-- }}}
 
--- Handle runtime errors after startup
+-- {{{ Handle runtime errors after startup
 do
 	local in_error = false
 	awesome.connect_signal("debug::error", function(err)
@@ -56,88 +49,61 @@ end
 naughty.config.defaults.ontop = true
 -- }}}
 
-local modkey = "Mod4"
-local altkey = "Mod1"
-local terminal = "alacritty"
-local editor = os.getenv("EDITOR") or "vim"
-local browser = "MOZ_DBUS_REMOTE=1 firefox"
-local guieditor = "code"
-local scrlocker = "betterlockscreen -l dim"
+local modkey             = "Mod4"
+local altkey             = "Mod1"
+local terminal           = "alacritty"
+local editor             = os.getenv("EDITOR") or "vim"
+local scrlocker          = "betterlockscreen -l dim"
 local password_generator = "/home/nomad/go/bin/go-pass"
 
-awful.util.terminal = terminal
-awful.util.tagnames = { "1", "2", "3", "4", "5", "6", "7", "8", "9" }
-awful.layout.layouts = {
-	--treetile,
-	awful.layout.suit.tile,
-	-- awful.layout.suit.tile.left,
-	-- awful.layout.suit.tile.bottom,
-	-- awful.layout.suit.floating,
-	-- awful.layout.suit.tile.top,
-	-- awful.layout.suit.fair,
-	-- awful.layout.suit.fair.horizontal,
-	-- awful.layout.suit.spiral,
-	-- awful.layout.suit.spiral.dwindle,
-	-- awful.layout.suit.max,
-	-- awful.layout.suit.max.fullscreen,
-	-- awful.layout.suit.magnifier,
-	-- awful.layout.suit.corner.nw,
-	-- awful.layout.suit.corner.ne,
-	-- awful.layout.suit.corner.sw,
-	-- awful.layout.suit.corner.se,
-	-- lain.layout.cascade,
-	-- lain.layout.cascade.tile,
-	-- lain.layout.centerwork,
-	-- lain.layout.centerwork.horizontal,
-	-- lain.layout.termfair,
-	-- lain.layout.termfair.center,
-}
+awful.util.terminal      = terminal
+awful.util.tagnames      = { "1", "2", "3", "4", "5", "6", "7", "8", "9" }
+awful.layout.layouts     = { awful.layout.suit.tile }
 
-awful.util.taglist_buttons = my_table.join(
+-- {{{ Taglist buttons
+awful.util.taglist_buttons = config_table.join(
+  -- focus tag on click (using left mouse click)
 	awful.button({}, 1, function(t)
 		t:view_only()
 	end),
+  -- move client to tag (using modkey + left click)
 	awful.button({ modkey }, 1, function(t)
 		if client.focus then
 			client.focus:move_to_tag(t)
 		end
 	end),
-	awful.button({}, 3, awful.tag.viewtoggle),
-	awful.button({ modkey }, 3, function(t)
-		if client.focus then
-			client.focus:toggle_tag(t)
-		end
-	end),
-	awful.button({}, 4, function(t)
+  -- focus next tag (using mouse scroll wheel up)
+	awful.button({}, 5, function(t)
 		awful.tag.viewnext(t.screen)
 	end),
-	awful.button({}, 5, function(t)
+  -- focus previous tag (using mouse scroll wheel down)
+	awful.button({}, 4, function(t)
 		awful.tag.viewprev(t.screen)
 	end)
 )
+-- }}}
 
-awful.util.tasklist_buttons = my_table.join(
+-- {{{ Tasklist buttons
+awful.util.tasklist_buttons = config_table.join(
+  -- left click to minimize/un-minimize client
 	awful.button({}, 1, function(c)
 		if c == client.focus then
 			c.minimized = true
 		else
-			--c:emit_signal("request::activate", "tasklist", {raise = true})<Paste>
-
-			-- Without this, the following
-			-- :isvisible() makes no sense
 			c.minimized = false
 			if not c:isvisible() and c.first_tag then
 				c.first_tag:view_only()
 			end
-			-- This will also un-minimize
-			-- the client, if needed
+			-- This will also un-minimize the client, if needed
 			client.focus = c
 			c:raise()
 		end
 	end),
+  -- middle click to close client
 	awful.button({}, 2, function(c)
 		c:kill()
 	end),
+  -- right click to toggle floating
 	awful.button({}, 3, function()
 		local instance = nil
 
@@ -149,58 +115,12 @@ awful.util.tasklist_buttons = my_table.join(
 				instance = awful.menu.clients({ theme = { width = dpi(150) } })
 			end
 		end
-	end),
-	awful.button({}, 4, function()
-		awful.client.focus.byidx(1)
-	end),
-	awful.button({}, 5, function()
-		awful.client.focus.byidx(-1)
 	end)
 )
-
-lain.layout.termfair.nmaster = 3
-lain.layout.termfair.ncol = 1
-lain.layout.termfair.center.nmaster = 3
-lain.layout.termfair.center.ncol = 1
-lain.layout.cascade.tile.offset_x = dpi(2)
-lain.layout.cascade.tile.offset_y = dpi(32)
-lain.layout.cascade.tile.extra_padding = dpi(5)
-lain.layout.cascade.tile.nmaster = 5
-lain.layout.cascade.tile.ncol = 2
-
-beautiful.init(string.format("%s/.config/awesome/theme.lua", os.getenv("HOME")))
--- revelation.init()
 -- }}}
 
--- {{{ Menu
-local menu = {
-	{
-		"hotkeys",
-		function()
-			return false, hotkeys_popup.show_help
-		end,
-	},
-	{ "manual", terminal .. " -e man awesome" },
-	{ "edit config", string.format("%s -e %s %s", terminal, editor, awesome.conffile) },
-	{ "restart", awesome.restart },
-	{
-		"quit",
-		function()
-			awesome.quit()
-		end,
-	},
-}
-awful.util.mymainmenu = freedesktop.menu.build({
-	icon_size = beautiful.menu_height or dpi(12),
-	before = {
-		{ "Awesome", menu, beautiful.awesome_icon },
-		-- other triads can be put here
-	},
-	after = {
-		{ "Open terminal", terminal },
-		-- other triads can be put here
-	},
-})
+-- {{{ Initialize theme
+beautiful.init(theme)
 -- }}}
 
 -- {{{ Scratchpad
@@ -213,19 +133,8 @@ local term_scratch = bling.module.scratchpad({
 	ontop = true,
 	geometry = { x = 360, y = 90, height = 900, width = 1200 }, -- The geometry in a floating state
 	reapply = true, -- Whether all those properties should be reapplied on every new opening of the scratchpad (MUST BE TRUE FOR ANIMATIONS)
-	dont_focus_before_close = false, -- When set to true, the scratchpad will be closed by the toggle function regardless of whether its focused or not. When set to false, the toggle function will first bring the scratchpad into focus and only close it on a second call
+	dont_focus_before_close = true, -- When set to true, the scratchpad will be closed by the toggle function regardless of whether its focused or not. When set to false, the toggle function will first bring the scratchpad into focus and only close it on a second call
 })
--- local slack_scratch = bling.module.scratchpad {
---   command                 = "slack", -- How to spawn the scratchpad
---   rule                    = { instance = "slack" }, -- The rule that the scratchpad will be searched by
---   sticky                  = true, -- Whether the scratchpad should be sticky
---   autoclose               = false, -- Whether it should hide itself when losing focus
---   floating                = true, -- Whether it should be floating (MUST BE TRUE FOR ANIMATIONS)
---   ontop                   = true,
---   geometry                = { x = 180, y = 90, height = 900, width = 1500 }, -- The geometry in a floating state
---   reapply                 = true, -- Whether all those properties should be reapplied on every new opening of the scratchpad (MUST BE TRUE FOR ANIMATIONS)
---   dont_focus_before_close = false, -- When set to true, the scratchpad will be closed by the toggle function regardless of whether its focused or not. When set to false, the toggle function will first bring the scratchpad into focus and only close it on a second call
--- }
 -- }}}
 
 -- {{{ Screen
@@ -259,67 +168,34 @@ awful.screen.connect_for_each_screen(function(s)
 end)
 -- }}}
 
--- {{{ Mouse bindings
-root.buttons(my_table.join(
-	awful.button({}, 3, function()
-		awful.util.mymainmenu:toggle()
-	end)
-	--awful.button({ }, 4, awful.tag.viewnext),
-	--awful.button({ }, 5, awful.tag.viewprev)
-))
--- }}}
-
 -- {{{ Key bindings
-globalkeys = my_table.join(
-	-- Take a screenshot
-	awful.key({}, "Print", function()
-		os.execute("scrot '/home/nomad/Pictures/Screenshots/%Y-%m-%d-%H-%M-%S_$wx$h.jpg'")
-	end, { description = "take a screenshot", group = "hotkeys" }),
-
+Globalkeys = config_table.join(
 	-- X screen locker
 	awful.key({ altkey, "Control" }, "l", function()
 		os.execute(scrlocker)
 	end, { description = "lock screen", group = "hotkeys" }),
 
-	-- xrandr extension
-	-- awful.key({ modkey, "Control" }, "m", function()
-	-- 	xrandr.xrandr()
-	-- end, { description = "Toggle xrandr", group = "hotkeys" }),
-
-	-- scratchpads
+	-- scratchpad
 	awful.key({ modkey }, "l", function()
 		term_scratch:toggle()
 	end, { description = "Scratchpad terminal", group = "hotkeys" }),
-	-- awful.key({ modkey, }, "i", function() slack_scratch:toggle() end,
-	--   { description = "Slack", group = "hotkeys" }),
-
 	-- Hotkeys
 	awful.key({ modkey }, "s", hotkeys_popup.show_help, { description = "show help", group = "awesome" }),
-	-- Tag browsing
-	-- awful.key({ modkey }, "Left", awful.tag.viewprev, { description = "view previous", group = "tag" }),
-	-- awful.key({ modkey }, "Right", awful.tag.viewnext, { description = "view next", group = "tag" }),
-	-- awful.key({ modkey }, "Escape", awful.tag.history.restore, { description = "go back", group = "tag" }),
 
-	-- Non-empty tag browsing
-	-- awful.key({ altkey }, "Left", function() lain.util.tag_view_nonempty(-1) end,
-	--   { description = "view  previous nonempty", group = "tag" }),
-	-- awful.key({ altkey }, "Right", function() lain.util.tag_view_nonempty(1) end,
-	--   { description = "view  previous nonempty", group = "tag" }),
-
-	-- By direction client focus
+	-- {{{ By idx client focus
 	awful.key({ modkey }, "n", function()
 		awful.client.focus.byidx(1)
 		if client.focus then
 			client.focus:raise()
 		end
 	end, { description = "focus down", group = "client" }),
-
 	awful.key({ modkey }, "e", function()
 		awful.client.focus.byidx(-1)
 		if client.focus then
 			client.focus:raise()
 		end
 	end, { description = "focus up", group = "client" }),
+  -- }}}
 
 	awful.key({ modkey }, "w", function()
 		awful.util.mymainmenu:show()
@@ -493,7 +369,7 @@ globalkeys = my_table.join(
 	--]]
 )
 
-clientkeys = my_table.join(
+clientkeys = config_table.join(
 	-- awful.key({ altkey, "Shift" }, "m", lain.util.magnify_client, { description = "magnify client", group = "client" }),
 	awful.key({ modkey }, "f", function(c)
 		c.fullscreen = not c.fullscreen
@@ -543,8 +419,8 @@ for i = 1, 9 do
 		descr_move = { description = "move focused client to tag #", group = "tag" }
 		descr_toggle_focus = { description = "toggle focused client on tag #", group = "tag" }
 	end
-	globalkeys = my_table.join(
-		globalkeys,
+	Globalkeys = config_table.join(
+		Globalkeys,
 		-- View tag only.
 		awful.key({ modkey }, "#" .. i + 9, function()
 			local screen = awful.screen.focused()
@@ -597,7 +473,7 @@ clientbuttons = gears.table.join(
 )
 
 -- Set keys
-root.keys(globalkeys)
+root.keys(Globalkeys)
 -- }}}
 
 -- {{{ Rules
@@ -714,6 +590,6 @@ function spawn_on_tag(command, class, tag, test)
 end
 
 spawn_on_tag("MOZ_DBUS_REMOTE=1 firefox -P Private", "firefox", screen[1].tags[1], "class")
-spawn_on_tag("MOZ_DBUS_REMOTE=1 firefox -P Work", "firefox", screen[1].tags[1], "class")
-spawn_on_tag("slack", "Slack", screen[1].tags[2], "class")
-spawn_on_tag(terminal, "Alacritty", screen[1].tags[3], "class")
+spawn_on_tag("MOZ_DBUS_REMOTE=1 firefox -P Work", "firefox", screen[2].tags[1], "class")
+spawn_on_tag("slack", "Slack", screen[2].tags[2], "class")
+spawn_on_tag(terminal, "Alacritty", screen[2].tags[3], "class")
