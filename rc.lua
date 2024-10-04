@@ -12,7 +12,9 @@ local lain          = require("lain")
 local hotkeys_popup = require("awful.hotkeys_popup").widget
 local dpi           = require("beautiful.xresources").apply_dpi
 local bling         = require("bling")
+local helpers       = require("helpers")
 local theme         = require("theme")
+local xrandr        = require("xrandr")
                       require("awful.autofocus")
                       require("awful.hotkeys_popup.keys")
 
@@ -131,7 +133,7 @@ local term_scratch = bling.module.scratchpad({
 	autoclose = false, -- Whether it should hide itself when losing focus
 	floating = true, -- Whether it should be floating (MUST BE TRUE FOR ANIMATIONS)
 	ontop = true,
-	geometry = { x = 360, y = 90, height = 900, width = 1200 }, -- The geometry in a floating state
+	geometry = { x = 700, y = 200, height = 900, width = 1200 }, -- The geometry in a floating state
 	reapply = true, -- Whether all those properties should be reapplied on every new opening of the scratchpad (MUST BE TRUE FOR ANIMATIONS)
 	dont_focus_before_close = true, -- When set to true, the scratchpad will be closed by the toggle function regardless of whether its focused or not. When set to false, the toggle function will first bring the scratchpad into focus and only close it on a second call
 })
@@ -197,9 +199,9 @@ Globalkeys = config_table.join(
 	end, { description = "focus up", group = "client" }),
   -- }}}
 
-	awful.key({ modkey }, "w", function()
-		awful.util.mymainmenu:show()
-	end, { description = "show main menu", group = "awesome" }),
+	-- awful.key({ modkey }, "w", function()
+	-- 	awful.util.mymainmenu:show()
+	-- end, { description = "show main menu", group = "awesome" }),
 
 	awful.key({ modkey, "Shift" }, "n", function()
 		awful.client.swap.byidx(1)
@@ -260,9 +262,13 @@ Globalkeys = config_table.join(
 	-- 	lain.util.move_tag(1)
 	-- end, { description = "move tag to the right", group = "tag" }),
 
-	awful.key({ modkey, "Shift" }, "d", function()
-		lain.util.delete_tag()
-	end, { description = "delete tag", group = "tag" }),
+	-- awful.key({ modkey, "Shift" }, "d", function()
+	-- 	lain.util.delete_tag()
+	-- end, { description = "delete tag", group = "tag" }),
+	--  xrandr
+	awful.key({ modkey }, "j", function()
+		xrandr.xrandr()
+	end, { description = "xrandr", group = "awesome" }),
 
 	-- Standard program
 	awful.key({ modkey }, "Return", function()
@@ -289,22 +295,13 @@ Globalkeys = config_table.join(
 		awful.tag.incncol(-1, nil, true)
 	end, { description = "decrease the number of columns", group = "layout" }),
 
-	awful.key({ modkey }, "space", function()
-		awful.layout.inc(1)
-	end, { description = "select next", group = "layout" }),
+	-- awful.key({ modkey }, "space", function()
+	-- 	awful.layout.inc(1)
+	-- end, { description = "select next", group = "layout" }),
 
-	awful.key({ modkey, "Shift" }, "space", function()
-		awful.layout.inc(-1)
-	end, { description = "select previous", group = "layout" }),
-
-	awful.key({ modkey, "Control" }, "u", function()
-		local c = awful.client.restore()
-		-- Focus restored client
-		if c then
-			client.focus = c
-			c:raise()
-		end
-	end, { description = "restore minimized", group = "client" }),
+	-- awful.key({ modkey, "Shift" }, "space", function()
+	-- 	awful.layout.inc(-1)
+	-- end, { description = "select previous", group = "layout" }),
 
 	-- Brightness
 	awful.key({}, "XF86MonBrightnessUp", function()
@@ -344,6 +341,15 @@ Globalkeys = config_table.join(
 	awful.key({ modkey }, "v", function()
 		awful.spawn(password_generator)
 	end, { description = "Generate password and place in clipboard buffer", group = "launcher" }),
+
+	awful.key({ modkey, "Control" }, "u", function()
+		local c = awful.client.restore()
+		-- Focus restored client
+		if c then
+			client.focus = c
+			c:raise()
+		end
+	end, { description = "restore minimized", group = "client" }),
 
 	-- Prompt
 	-- awful.key({ modkey }, "r", function() awful.screen.focused().mypromptbox:run() end,
@@ -402,11 +408,10 @@ clientkeys = config_table.join(
 		c.minimized = true
 	end, { description = "minimize", group = "client" }),
 
-	awful.key({ modkey }, "y", function(c)
+	awful.key({ modkey, "Shift" }, "f", function(c)
 		c.maximized = not c.maximized
 		c:raise()
 	end, { description = "toggle maximize", group = "client" })
-	-- awful.key({ modkey }, "e", revelation)
 )
 
 -- Bind all key numbers to tags.
@@ -520,18 +525,6 @@ awful.rules.rules =
 		c:emit_signal("request::activate", "mouse_enter", { raise = true })
 	end)
 
-client.connect_signal("focus", function(c)
-	c.border_color = beautiful.border_focus
-end)
-client.connect_signal("unfocus", function(c)
-	c.border_color = beautiful.border_normal
-end)
-client.connect_signal("manage", function(c)
-	c.shape = function(cr, w, h)
-		gears.shape.rounded_rect(cr, w, h, 2)
-	end
-end)
-
 -- Signals
 -- ===================================================================
 -- Signal function to execute when a new client appears.
@@ -556,6 +549,12 @@ client.connect_signal("manage", function(c)
 	-- end
 end)
 
+client.connect_signal("focus", function(c)
+	c.border_color = beautiful.border_focus
+end)
+client.connect_signal("unfocus", function(c)
+	c.border_color = beautiful.border_normal
+end)
 -- Rounded cornered windows
 client.connect_signal("manage", function(c)
 	c.shape = function(cr, w, h)
@@ -563,33 +562,7 @@ client.connect_signal("manage", function(c)
 	end
 end)
 
--- spawn command to given tag
-function spawn_on_tag(command, class, tag, test)
-	local test = test or "class"
-	local callback
-	callback = function(c)
-		if test == "class" then
-			if c.class == class then
-				c:move_to_tag(tag)
-				client.disconnect_signal("manage", callback)
-			end
-		elseif test == "instance" then
-			if c.instance == class then
-				c:move_to_tag(tag)
-				client.disconnect_signal("manage", callback)
-			end
-		elseif test == "name" then
-			if string.match(c.name, class) then
-				c:move_to_tag(tag)
-				client.disconnect_signal("manage", callback)
-			end
-		end
-	end
-	client.connect_signal("manage", callback)
-	awful.spawn.with_shell(command)
-end
-
-spawn_on_tag("MOZ_DBUS_REMOTE=1 firefox -P Private", "firefox", screen[1].tags[1], "class")
-spawn_on_tag("MOZ_DBUS_REMOTE=1 firefox -P Work", "firefox", screen[2].tags[1], "class")
-spawn_on_tag("slack", "Slack", screen[2].tags[2], "class")
-spawn_on_tag(terminal, "Alacritty", screen[2].tags[3], "class")
+helpers.Spawn_on_tag("MOZ_DBUS_REMOTE=1 firefox -P Private", "firefox", screen[1].tags[1], "class")
+helpers.Spawn_on_tag("MOZ_DBUS_REMOTE=1 firefox -P Work", "firefox", screen[1].tags[1], "class")
+helpers.Spawn_on_tag("slack", "Slack", screen[1].tags[2], "class")
+helpers.Spawn_on_tag(terminal, "Alacritty", screen[1].tags[3], "class")

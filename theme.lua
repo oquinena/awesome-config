@@ -1,56 +1,54 @@
-local gears = require("gears")
-local lain = require("lain")
-local awful = require("awful")
-local wibox = require("wibox")
-local dpi = require("beautiful.xresources").apply_dpi
+local gears          = require("gears")
+local lain           = require("lain")
+local awful          = require("awful")
+local wibox          = require("wibox")
+local dpi            = require("beautiful.xresources").apply_dpi
 local weather_widget = require("weather")
--- require("wifi")
+local helpers        = require("helpers")
 
-local os = os
-local my_table = awful.util.table or gears.table -- 4.{0,1} compatibility
+local my_table = awful.util.table
 
-local theme = {}
-theme.dir = os.getenv("HOME") .. "/.config/awesome"
-theme.wallpaper = os.getenv("WALLPAPER")
-theme.font = "Arimo Nerd Font 11"
-theme.fg_normal = "#cdd6f4"
-theme.fg_focus = "#b4befe"
-theme.fg_urgent = "#181825"
-theme.fg_occupied = "#181825"
-theme.bg_normal = "#1e222a"
--- theme.bg_normal                = "#24292e"
-theme.bg_focus = "#81a1c1"
-theme.bg_occupied = "#5e81ac"
-theme.bg_urgent = "#d08770"
-theme.bg_systray = theme.bg_normal
-theme.border_width = dpi(1)
-theme.border_normal = "#1e1e2e"
-theme.border_focus = "#b4befe"
-theme.border_marked = "#1e222a"
-theme.tasklist_bg_focus = theme.bg_normal
-theme.titlebar_bg_focus = theme.bg_focus
-theme.titlebar_bg_normal = theme.bg_normal
-theme.titlebar_fg_focus = theme.bg_normal
-theme.menu_height = dpi(28)
-theme.menu_width = dpi(200)
-theme.bar_height = dpi(20)
-theme.layout_tile = theme.dir .. "/icons/tile.png"
-theme.layout_tileleft = theme.dir .. "/icons/tileleft.png"
-theme.layout_tilebottom = theme.dir .. "/icons/tilebottom.png"
-theme.layout_tiletop = theme.dir .. "/icons/tiletop.png"
-theme.layout_fairv = theme.dir .. "/icons/fairv.png"
-theme.layout_fairh = theme.dir .. "/icons/fairh.png"
-theme.layout_spiral = theme.dir .. "/icons/spiral.png"
-theme.layout_dwindle = theme.dir .. "/icons/dwindle.png"
-theme.layout_max = theme.dir .. "/icons/max.png"
-theme.layout_fullscreen = theme.dir .. "/icons/fullscreen.png"
-theme.layout_magnifier = theme.dir .. "/icons/magnifier.png"
-theme.layout_floating = theme.dir .. "/icons/floating.png"
-theme.layout_termfair = theme.dir .. "/icons/termfair.png"
-theme.layout_treetile = theme.dir .. "/icons/treetile.png"
+local theme                    = {}
+theme.dir                      = os.getenv("HOME") .. "/.config/awesome"
+theme.wallpaper                = os.getenv("WALLPAPER")
+theme.font                     = "Arimo Nerd Font 11"
+theme.fg_normal                = "#cdd6f4"
+theme.fg_focus                 = "#b4befe"
+theme.fg_urgent                = "#181825"
+theme.fg_occupied              = "#181825"
+theme.bg_normal                = "#1e222a"
+theme.bg_focus                 = "#81a1c1"
+theme.bg_occupied              = "#5e81ac"
+theme.bg_urgent                = "#d08770"
+theme.bg_systray               = theme.bg_normal
+theme.border_width             = dpi(1)
+theme.border_normal            = "#1e1e2e"
+theme.border_focus             = "#b4befe"
+theme.border_marked            = "#1e222a"
+theme.tasklist_bg_focus        = theme.bg_normal
+theme.titlebar_bg_focus        = theme.bg_focus
+theme.titlebar_bg_normal       = theme.bg_normal
+theme.titlebar_fg_focus        = theme.bg_normal
+theme.menu_height              = dpi(28)
+theme.menu_width               = dpi(200)
+theme.bar_height               = dpi(20)
+theme.layout_tile              = theme.dir .. "/icons/tile.png"
+theme.layout_tileleft          = theme.dir .. "/icons/tileleft.png"
+theme.layout_tilebottom        = theme.dir .. "/icons/tilebottom.png"
+theme.layout_tiletop           = theme.dir .. "/icons/tiletop.png"
+theme.layout_fairv             = theme.dir .. "/icons/fairv.png"
+theme.layout_fairh             = theme.dir .. "/icons/fairh.png"
+theme.layout_spiral            = theme.dir .. "/icons/spiral.png"
+theme.layout_dwindle           = theme.dir .. "/icons/dwindle.png"
+theme.layout_max               = theme.dir .. "/icons/max.png"
+theme.layout_fullscreen        = theme.dir .. "/icons/fullscreen.png"
+theme.layout_magnifier         = theme.dir .. "/icons/magnifier.png"
+theme.layout_floating          = theme.dir .. "/icons/floating.png"
+theme.layout_termfair          = theme.dir .. "/icons/termfair.png"
+theme.layout_treetile          = theme.dir .. "/icons/treetile.png"
 theme.tasklist_plain_task_name = true
-theme.tasklist_disable_icon = true
-theme.useless_gap = dpi(5)
+theme.tasklist_disable_icon    = true
+theme.useless_gap              = dpi(5)
 
 local markup = lain.util.markup
 local separators = lain.util.separators
@@ -58,16 +56,6 @@ local separators = lain.util.separators
 -- Get openweathermap API-key
 local api_key = theme.dir .. "/openweathermap.apikey"
 local current_location = theme.dir .. "/current_location"
-local function get_data(file)
-	local f = io.open(file, "rb")
-	if not f then
-		return nil
-	end
-	local content = f:read("*a")
-	content = string.gsub(content, "^%s*(.-)%s*$", "%1") -- strip off any space or newline
-	f:close()
-	return content
-end
 
 -- Current ssid
 local ssid = awful.widget.watch("ssid.sh", 3, function(widget, stdout)
@@ -98,6 +86,7 @@ end)
 local bat = lain.widget.bat({
 	settings = function()
     local icon
+    local bat_now = bat_now
 		if bat_now.status and bat_now.status ~= "N/A" then
 			if bat_now.ac_status == 1 then
 				icon = "󰚥 "
@@ -280,9 +269,10 @@ function theme.at_screen_connect(s)
 			spr,
 			brightwidget,
 			weather_widget({
-				api_key = get_data(api_key),
+				api_key = helpers.Get_data(api_key),
 				coordinates = { 62.5464, 12.5419 },
 				show_daily_forecast = true,
+        timeout = 240,
 			}),
 			-- spr,
 			-- wifi_widget,
